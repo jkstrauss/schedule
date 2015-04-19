@@ -5,254 +5,244 @@
 <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.js"></script>
 <script src= "http://rawgit.com/hebcal/hebcal-js/master/client/hebcal.js"></script>
 <style>
-                table, td, th {
-                                border: black solid 1px;
-                }
+	table, td, th {
+		border: black solid 1px;
+    }
                
-                td, th {
-                                white-space:nowrap;
-                                 font-size:15pt;
-                }
+    td, th {
+		white-space:nowrap;
+        font-size:15pt;
+    }
 
-                .shabboth {
-	background-color:#ddd;
-                }
-               
-                .hidden {
-                                visibility: hidden;
-                }
-               
-                .newMonth {
-                                background-color:gray;
-                                color:white;
-                }
+    .shabboth {
+		background-color:#ddd;
+	}
+	
+	.hidden {
+		visibility: hidden;
+	}
+
+	.newMonth {
+		background-color:gray;
+		color:white;
+	}
 </style>
 </head>
- 
+
 <body ng-app="myApp" ng-controller="myCtrl" dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
  
-<div>
-  <input type="number" min="1" ng-model="columns.schedule.perDay" dir="ltr" style="display:none"/>
-  <input type="number" min="4" max="{{cells.length}}" ng-model="columns.rowsPerColumn" dir="ltr" style="display:none"/>
-  <input type="date" ng-model="start" dir="ltr" style="display:none"/>
-  <select ng-model="language" dir="ltr" style="display:none">
-                <option value="E">English</option>
-                <option value="H">Hebrew</option>
-  </select>
- 
-  <table ng-show="columnizedCells.length > 0">
-                <tr>
-                                <th ng-repeat="cell in columnizedCells[0]" colspan="2">{{calcNum(getDate(cell.dayIndex).getFullYear())}}</th>
-                </tr>
-                <tr>
-                                <th ng-repeat-start="cell in columnizedCells[0]">{{getMonth(getDate(cell.dayIndex))}}</th>
-                                <th ng-repeat-end>{{cell.begin.book || cell.bookOnly}}</th>
-                </tr>
-                <tr>
-                </tr>
-                <tr ng-repeat="row in columnizedCells">
-                                                <td ng-repeat-start="cell in row" ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
-                                                <td ng-repeat-end ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
-                                                                <span ng-hide="cell.bookOnly">
-                                                                                <span ng-show="cell.begin">
-                                                                                                {{calcNum(cell.begin.chapter)}}:{{calcNum(cell.begin.verse)}}
-                                                                                                <span ng-show="!cell.end">-</span>
-                                                                                </span>
-                                                                                <span ng-show="cell.end">
-                                                                                                <span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter && cell.begin.verse == cell.end.verse">
-                                                                                                                <span ng-show="cell.begin">
-                                                                                                                                -
-                                                                                                                </span>
-                                                                                                                <span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter">
-                                                                                                                                {{calcNum(cell.end.chapter)}}:</span>{{calcNum(cell.end.verse)}}
-                                                                                                </span>
-                                                                                </span>
-                                                                </span>
-                                                                <span ng-show="cell.bookOnly">
-                                                                                {{cell.bookOnly}}
-                                                                </span>
-                                                </td>
-                  </tr>
+	<div>
+		<input type="number" min="1" ng-model="columns.schedule.perDay" dir="ltr" style="display:none"/>
+		<input type="number" min="4" max="{{cells.length}}" ng-model="columns.rowsPerColumn" dir="ltr" style="display:none"/>
+		<input type="date" ng-model="start" dir="ltr" style="display:none"/>
+		<select ng-model="language" dir="ltr" style="display:none">
+			<option value="E">English</option>
+			<option value="H">Hebrew</option>
+	</select>
+
+	<table ng-show="columnizedCells.length > 0">
+		<tr>
+			<th ng-repeat="cell in columnizedCells[0]" colspan="2">{{calcNum(getDate(cell.dayIndex).getFullYear())}}</th>
+		</tr>
+		<tr>
+			<th ng-repeat-start="cell in columnizedCells[0]">{{getMonth(getDate(cell.dayIndex))}}</th>
+			<th ng-repeat-end>{{cell.begin.book || cell.bookOnly}}</th>
+		</tr>
+		<tr ng-repeat="row in columnizedCells">
+			<td ng-repeat-start="cell in row" ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
+			<td ng-repeat-end ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
+				<span ng-hide="cell.bookOnly">
+					<span ng-show="cell.begin">
+						{{calcNum(cell.begin.chapter)}}:{{calcNum(cell.begin.verse)}}
+						<span ng-show="!cell.end">-</span>
+					</span>
+					<span ng-show="cell.end">
+						<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter && cell.begin.verse == cell.end.verse">
+							<span ng-show="cell.begin"> - </span>
+							<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter">{{calcNum(cell.end.chapter)}}:</span>{{calcNum(cell.end.verse)}}
+						</span>
+					</span>
+					</span>
+				<span ng-show="cell.bookOnly">
+					{{cell.bookOnly}}
+				</span>
+			</td>
+		</tr>
   </table>
 </div>
 <script>
-function log(val, message) {
-  if (message) console.log(message);
-  console.log(JSON.stringify(val));
-  return val;
-}
-var app = angular.module('myApp', []).directive('myVar', function () {
-                                return {
-                                                restrict: 'A',
-                                                link: function postLink(scope, element, attrs) {
-                                                                var splits = attrs.myVar.split("=");
-                                                                scope.$watch(splits[1], function (val) {
-                                                                                scope.$eval(attrs.myVar);
-                                                                });
-                                                }
-                                };
-                });
-var filter;
-app.controller('myCtrl', function($scope, $filter) {
-    $scope.books = [{name:'יהושע',chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,43,34,16,33]}];
-    $scope.columns = {rowsPerColumn:28,schedule:{perDay:5}};
-                $scope.start = new Date(2015, 3, 23);
-                $scope.startHeb = new Hebcal.HDate($scope.start).abs();
-                $scope.dates = {};
-                $scope.numbers = {};
-                $scope.language = 'H';
-                $scope.cells = [];
-                $scope.columnizedCells = [];
-                $scope.headers = [];
-                $scope.getDate = function(add) {
-                                var abs = add + $scope.startHeb;
-                                var date = $scope.dates[add + $scope.startHeb];
-                                if(!date){
-                                                var hDate = new Hebcal.HDate(abs);
-                                                date = $scope.dates[abs] = {H:hDate,E:hDate.greg()};
-                                }
-                                return date[$scope.language];
-                }
-                $scope.getMonth = function(date) {
-                                return hebrew = $scope.language == 'H' ? date.getMonthName('h').replace(/["']/g, '') : $filter('date')(date, 'MMM');
-                }
-                $scope.calcDate = function (add) {
-                                var hebrew = $scope.language == 'H';
-                                var date = $scope.getDate(add);
-                                var returnVal = {date:date};
-                                if(date.getDate() == 1) {
-                                                returnVal['newMonth'] = true;
-                                                returnVal['display'] =
-                                                                date.getMonth() == (hebrew ? 7 : 0) ?
-                                                                date.getFullYear() :
-                                                                hebrew ? date.getMonthName('h').replace(/["']/g, '') : $filter('date')(date, 'MMM');
-                                } else {
-                                                returnVal['display'] = date.getDate();
-                                }
-                                return returnVal
-                }
-               
-                $scope.calcNum = function (text) {
-                                if($scope.language == 'H' && !isNaN(text)){
-                                                var gem = $scope.numbers[text];
-                                                if(!gem){
-                                                                gem = $scope.numbers[text] = (Hebcal.gematriya(text, 3) + '').replace(/["']/g, '');
-                                                }
-                                                return gem;
-                                }
-                                return text;
-                }
-               
-                $scope.$watch(
-                                'columns.schedule',
-                                function() {
-                                                var dayIndex = 0;
-                                                var cells = new Array();
-                                                var bookIndex = 0;
-                                                var book = $scope.books[bookIndex];
-                                                var chapterIndex = -1;
-                                                var chapterSize;
-                                               
-                                                function incrementChapter() {
-                                                                if(!(book.chapters[chapterIndex + 1])){
-                                                                                if(!$scope.books[bookIndex+1]){
-                                                                                                return false;
-                                                                                } else {
-                                                                                                bookIndex++;
-                                                                                                chapterIndex = 0;
-                                                                                }
-                                                                } else {
-                                                                                chapterIndex++;
-                                                                }
-                                                               
-                                                                book = $scope.books[bookIndex];
-                                                                chapterSize = book.chapters[chapterIndex];
-                                                                return true;
-                                                }
-                                               
-                                                incrementChapter();
-                                                var verse = 0;
-                                                 
-                                                function generatePoint(){
-                                                                return {chapter:chapterIndex + 1,verse:verse,book:book.name};
-                                                }
-                                                 
-                                                function moveVerse (moveNum) {
-                                                                var newVerse = verse + moveNum;
-                                                               
-                                                                while(newVerse > chapterSize){
-                                                                  newVerse -= chapterSize;
-                                                                  if(!(incrementChapter())){
-                                                                                verse = chapterSize;
-                                                                                return false;
-                                                                  }
-                                                                }
-                                                                verse = newVerse;
-                                                                return true;
-                                                }
- 
-                                                while($scope.columns.schedule.perDay >= 1 && moveVerse(1)){
-                                                                var firstCellIndex = cells.length;
-                                                                var rowSpan = 1;
-                                                                var begin = generatePoint();
-                                                                moveVerse($scope.columns.schedule.perDay - 1);
-                                                                var end = generatePoint();
-                                                                if(cells.length == 0 || begin.book != cells[cells.length - 1].end.book) {
-                                                                                cells.push({dayIndex:dayIndex,bookOnly:begin.book});
-                                                                                rowSpan++;
-                                                                }
-                                                               
-                                                                if(begin.book != end.book){
-                                                                                cells.push({dayIndex:dayIndex,begin:begin});
-                                                                                cells.push({dayIndex:dayIndex,bookOnly:end.book});
-                                                                                cells.push({dayIndex:dayIndex,end:end});
-                                                                                rowSpan +=2;
-                                                                } else {
-                                                                    cells.push({dayIndex:dayIndex,begin:begin,end:end});
-                                                                }
-                                                                cells[firstCellIndex].rowSpan=rowSpan;
-                                                                for(var c = firstCellIndex + 1; c < cells.length; c++){
-                                                                                cells[c].rowSpan = 0;
-                                                                }
-                                                                dayIndex++;
-                                                }
-                                                 
-                                                $scope.cells = cells;
-                                },
-                                true
-                );
-               
-                $scope.$watch(
-                                'columns',
-                                function() {
-                                                var columnizedCells = [];
-                                                var headers = [];
-                                                var rows = $scope.columns.rowsPerColumn >= 4 ? $scope.columns.rowsPerColumn : 21;
-                                                var row;
-                                                for(row = 0; row < Math.min(rows, $scope.cells.length); row++) {
-                                                                columnizedCells.push(new Array());
-                                                }
-                                                row = -1;
-                                                angular.forEach($scope.cells, function(cell, index) {
-                                                                while((row = (row + 1) % rows) + cell.rowSpan > rows){
-                                                                                columnizedCells[row].push({hidden:true});
-                                                                }
-                                                                columnizedCells[row].push(cell);
-                                                });
-                                                $scope.columnizedCells = columnizedCells;
-                                                $scope.headers = headers;
-                                },
-                                true
-                );
-               
-                $scope.$watch(
-                                'start',
-                                function(oldVal, newVal, scope) {
-                                                $scope.startHeb = new Hebcal.HDate($scope.start).abs();
-                                },
-                                true
-                );
-});
+	function log(val, message) {
+	  if (message) console.log(message);
+	  console.log(JSON.stringify(val));
+	  return val;
+	}
+
+	var app = angular.module('myApp', []);
+	
+	var filter;
+	app.controller('myCtrl', function($scope, $filter) {
+		$scope.books = [{name:'יהושע',chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,43,34,16,33]}];
+		$scope.columns = {rowsPerColumn:28,schedule:{perDay:5}};
+		$scope.start = new Date(2015, 3, 23);
+		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
+		$scope.dates = {};
+		$scope.numbers = {};
+		$scope.language = 'H';
+		$scope.cells = [];
+		$scope.columnizedCells = [];
+		$scope.headers = [];
+		$scope.getDate = function(add) {
+			var abs = add + $scope.startHeb;
+			var date = $scope.dates[add + $scope.startHeb];
+			if(!date){
+				var hDate = new Hebcal.HDate(abs);
+				date = $scope.dates[abs] = {H:hDate,E:hDate.greg()};
+			}
+			return date[$scope.language];
+		}
+
+		$scope.getMonth = function(date) {
+			return hebrew = $scope.language == 'H' ? 
+				date.getMonthName('h').replace(/["']/g, '') : 
+				$filter('date')(date, 'MMM');
+		}
+
+		$scope.calcDate = function (add) {
+			var hebrew = $scope.language == 'H';
+			var date = $scope.getDate(add);
+			var returnVal = {date:date};
+			if(date.getDate() == 1) {
+				returnVal['newMonth'] = true;
+				returnVal['display'] = date.getMonth() == (hebrew ? 7 : 0) ?
+					date.getFullYear() :
+					hebrew ? date.getMonthName('h').replace(/["']/g, '') : $filter('date')(date, 'MMM');
+			} else {
+				returnVal['display'] = date.getDate();
+			}
+			return returnVal
+		}
+
+		$scope.calcNum = function (text) {
+			if($scope.language == 'H' && !isNaN(text)){
+				var gem = $scope.numbers[text];
+				if(!gem){
+					gem = $scope.numbers[text] = (Hebcal.gematriya(text, 3) + '').replace(/["']/g, '');
+				}
+				return gem;
+			}
+			return text;
+		}
+
+		$scope.$watch(
+			'columns.schedule',
+			function() {
+				var dayIndex = 0;
+				var cells = new Array();
+				var bookIndex = 0;
+				var book = $scope.books[bookIndex];
+				var chapterIndex = -1;
+				var chapterSize;
+
+				function incrementChapter() {
+					if(!(book.chapters[chapterIndex + 1])){
+						if(!$scope.books[bookIndex+1]){
+							return false;
+						} else {
+							bookIndex++;
+							chapterIndex = 0;
+						}
+					} else {
+						chapterIndex++;
+					}
+
+						book = $scope.books[bookIndex];
+						chapterSize = book.chapters[chapterIndex];
+						return true;
+				}
+
+				incrementChapter();
+				var verse = 0;
+
+				function generatePoint(){
+					return {chapter:chapterIndex + 1,verse:verse,book:book.name};
+				}
+
+				function moveVerse (moveNum) {
+					var newVerse = verse + moveNum;
+
+					while(newVerse > chapterSize){
+						newVerse -= chapterSize;
+						if(!(incrementChapter())){
+							verse = chapterSize;
+							return false;
+						}
+					}
+					verse = newVerse;
+					return true;
+				}
+
+				while($scope.columns.schedule.perDay >= 1 && moveVerse(1)){
+					var firstCellIndex = cells.length;
+					var rowSpan = 1;
+					var begin = generatePoint();
+					moveVerse($scope.columns.schedule.perDay - 1);
+					var end = generatePoint();
+					if(cells.length == 0 || begin.book != cells[cells.length - 1].end.book) {
+						cells.push({dayIndex:dayIndex,bookOnly:begin.book});
+						rowSpan++;
+					}
+				   
+					if(begin.book != end.book){
+						cells.push({dayIndex:dayIndex,begin:begin});
+						cells.push({dayIndex:dayIndex,bookOnly:end.book});
+						cells.push({dayIndex:dayIndex,end:end});
+						rowSpan +=2;
+					} else {
+						cells.push({dayIndex:dayIndex,begin:begin,end:end});
+					}
+					cells[firstCellIndex].rowSpan=rowSpan;
+					for(var c = firstCellIndex + 1; c < cells.length; c++){
+						cells[c].rowSpan = 0;
+					}
+					dayIndex++;
+				}
+				
+				$scope.cells = cells;
+			},
+			true
+		);
+				
+		$scope.$watch(
+			'columns',
+			function() {
+				var columnizedCells = [];
+				var headers = [];
+				var rows = $scope.columns.rowsPerColumn >= 4 ? $scope.columns.rowsPerColumn : 21;
+				var row;
+				for(row = 0; row < Math.min(rows, $scope.cells.length); row++) {
+					columnizedCells.push(new Array());
+				}
+				row = -1;
+				angular.forEach($scope.cells, function(cell, index) {
+					while((row = (row + 1) % rows) + cell.rowSpan > rows){
+									columnizedCells[row].push({hidden:true});
+					}
+					columnizedCells[row].push(cell);
+				});
+				$scope.columnizedCells = columnizedCells;
+				$scope.headers = headers;
+			},
+			true
+		);
+
+		$scope.$watch(
+			'start',
+			function(oldVal, newVal, scope) {
+				$scope.startHeb = new Hebcal.HDate($scope.start).abs();
+			},
+			true
+		);
+	});
 </script>
  
 </body>
