@@ -81,6 +81,7 @@
 	
 	var filter;
 	app.controller('myCtrl', function($scope, $filter) {
+		$scope.log = log;
 		$scope.books = [{name:'יהושע',chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,43,34,16,33]}];
 		$scope.columns = {rowsPerColumn:28,schedule:{perDay:5}};
 		$scope.start = new Date(2015, 3, 23);
