@@ -22,7 +22,7 @@
 		visibility: hidden;
 	}
 
-	.newMonth {
+	.newMonth, .newBook {
 		background-color:gray;
 		color:white;
 	}
@@ -53,7 +53,7 @@
 			</tr>
 			<tr ng-repeat="cell in column track by $index">
 				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
-				<td ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
+				<td ng-class="{'hidden':cell.hidden,newBook:cell.bookOnly}">
 					<span ng-hide="cell.bookOnly">
 						<span ng-show="cell.begin">
 							{{calcNum(cell.begin.chapter)}}:{{calcNum(cell.begin.verse)}}
