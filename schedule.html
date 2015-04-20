@@ -32,8 +32,8 @@
 <body ng-app="myApp" ng-controller="myCtrl" dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
 	<div>
 		<div ng-hide="hideControls">
-			<input type="number" min="1" ng-model="columns.schedule.perDay" dir="ltr"/>
-			<input type="number" min="4" max="{{cells.length}}" ng-model="columns.rowsPerColumn" dir="ltr"/>
+			<input type="number" min="1" ng-model="columnInfo.schedule.perDay" dir="ltr"/>
+			<input type="number" min="4" max="{{cells.length}}" ng-model="columnInfo.rowsPerColumn" dir="ltr"/>
 			<input type="date" ng-model="start" dir="ltr"/>
 			<select ng-model="language" dir="ltr">
 				<option value="E">English</option>
@@ -42,35 +42,37 @@
 			<input type="checkbox" ng-model="hideControls" />
 		</div>
 
-	<table ng-show="columnizedCells.length > 0">
-		<tr>
-			<th ng-repeat="cell in columnizedCells[0]" colspan="2">{{calcNum(getDate(cell.dayIndex).getFullYear())}}</th>
-		</tr>
-		<tr>
-			<th ng-repeat-start="cell in columnizedCells[0]">{{getMonth(getDate(cell.dayIndex))}}</th>
-			<th ng-repeat-end>{{cell.begin.book || cell.bookOnly}}</th>
-		</tr>
-		<tr ng-repeat="row in columnizedCells">
-			<td ng-repeat-start="cell in row" ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
-			<td ng-repeat-end ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
-				<span ng-hide="cell.bookOnly">
-					<span ng-show="cell.begin">
-						{{calcNum(cell.begin.chapter)}}:{{calcNum(cell.begin.verse)}}
-						<span ng-show="!cell.end">-</span>
-					</span>
-					<span ng-show="cell.end">
-						<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter && cell.begin.verse == cell.end.verse">
-							<span ng-show="cell.begin"> - </span>
-							<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter">{{calcNum(cell.end.chapter)}}:</span>{{calcNum(cell.end.verse)}}
+	<div ng-repeat="column in columns" style="display:inline-block;height:10in">
+		<table>
+			<tr>
+				<th colspan="2">{{calcNum(getDate(column[0].dayIndex).getFullYear())}}</th>
+			</tr>
+			<tr>
+				<th>{{getMonth(getDate(column[0].dayIndex))}}</th>
+				<th>{{column[0].begin.book || column[0].bookOnly}}</th>
+			</tr>
+			<tr ng-repeat="cell in column">
+				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
+				<td ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
+					<span ng-hide="cell.bookOnly">
+						<span ng-show="cell.begin">
+							{{calcNum(cell.begin.chapter)}}:{{calcNum(cell.begin.verse)}}
+							<span ng-show="!cell.end">-</span>
 						</span>
+						<span ng-show="cell.end">
+							<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter && cell.begin.verse == cell.end.verse">
+								<span ng-show="cell.begin"> - </span>
+								<span ng-hide="cell.begin && cell.begin.chapter == cell.end.chapter">{{calcNum(cell.end.chapter)}}:</span>{{calcNum(cell.end.verse)}}
+							</span>
+						</span>
+						</span>
+					<span ng-show="cell.bookOnly">
+						{{cell.bookOnly}}
 					</span>
-					</span>
-				<span ng-show="cell.bookOnly">
-					{{cell.bookOnly}}
-				</span>
-			</td>
-		</tr>
-  </table>
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
 <script>
 	function log(val, message) {
@@ -85,15 +87,14 @@
 	app.controller('myCtrl', function($scope, $filter) {
 		$scope.log = log;
 		$scope.books = [{name:'יהושע',chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,43,34,16,33]}];
-		$scope.columns = {rowsPerColumn:28,schedule:{perDay:5}};
+		$scope.columnInfo = {rowsPerColumn:28,schedule:{perDay:5}};
 		$scope.start = new Date(2015, 3, 23);
 		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
 		$scope.dates = {};
 		$scope.numbers = {};
 		$scope.language = 'H';
 		$scope.cells = [];
-		$scope.columnizedCells = [];
-		$scope.headers = [];
+		$scope.columns = [];
 		$scope.getDate = function(add) {
 			var abs = add + $scope.startHeb;
 			var date = $scope.dates[add + $scope.startHeb];
@@ -137,7 +138,7 @@
 		}
 
 		$scope.$watch(
-			'columns.schedule',
+			'columnInfo.schedule',
 			function() {
 				var dayIndex = 0;
 				var cells = new Array();
@@ -184,11 +185,11 @@
 					return true;
 				}
 
-				while($scope.columns.schedule.perDay >= 1 && moveVerse(1)){
+				while($scope.columnInfo.schedule.perDay >= 1 && moveVerse(1)){
 					var firstCellIndex = cells.length;
 					var rowSpan = 1;
 					var begin = generatePoint();
-					moveVerse($scope.columns.schedule.perDay - 1);
+					moveVerse($scope.columnInfo.schedule.perDay - 1);
 					var end = generatePoint();
 					if(cells.length == 0 || begin.book != cells[cells.length - 1].end.book) {
 						cells.push({dayIndex:dayIndex,bookOnly:begin.book});
@@ -216,24 +217,23 @@
 		);
 				
 		$scope.$watch(
-			'columns',
+			'columnInfo',
 			function() {
-				var columnizedCells = [];
-				var headers = [];
-				var rows = $scope.columns.rowsPerColumn >= 4 ? $scope.columns.rowsPerColumn : 21;
+				var columns = [];
+				var rows = $scope.columnInfo.rowsPerColumn >= 4 ? $scope.columnInfo.rowsPerColumn : 21;
 				var row;
-				for(row = 0; row < Math.min(rows, $scope.cells.length); row++) {
-					columnizedCells.push(new Array());
-				}
+				var currentColumn;
 				row = -1;
 				angular.forEach($scope.cells, function(cell, index) {
 					while((row = (row + 1) % rows) + cell.rowSpan > rows){
-						columnizedCells[row].push({hidden:true});
+						currentColumn.push({hidden:true});
 					}
-					columnizedCells[row].push(cell);
+					if(row == 0) {
+						columns.push(currentColumn = []);
+					}
+					currentColumn.push(cell);
 				});
-				$scope.columnizedCells = columnizedCells;
-				$scope.headers = headers;
+				$scope.columns = columns;
 			},
 			true
 		);
