@@ -30,15 +30,17 @@
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl" dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
- 
 	<div>
-		<input type="number" min="1" ng-model="columns.schedule.perDay" dir="ltr" style="display:none"/>
-		<input type="number" min="4" max="{{cells.length}}" ng-model="columns.rowsPerColumn" dir="ltr" style="display:none"/>
-		<input type="date" ng-model="start" dir="ltr" style="display:none"/>
-		<select ng-model="language" dir="ltr" style="display:none">
-			<option value="E">English</option>
-			<option value="H">Hebrew</option>
-	</select>
+		<div ng-hide="hideControls">
+			<input type="number" min="1" ng-model="columns.schedule.perDay" dir="ltr"/>
+			<input type="number" min="4" max="{{cells.length}}" ng-model="columns.rowsPerColumn" dir="ltr"/>
+			<input type="date" ng-model="start" dir="ltr"/>
+			<select ng-model="language" dir="ltr">
+				<option value="E">English</option>
+				<option value="H">Hebrew</option>
+			</select>
+			<input type="checkbox" ng-model="hideControls" />
+		</div>
 
 	<table ng-show="columnizedCells.length > 0">
 		<tr>
