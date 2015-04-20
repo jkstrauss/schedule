@@ -30,7 +30,7 @@
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl" dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
-	<div>
+<div style="width:7.5in;text-align:center;">
 		<div ng-hide="hideControls">
 			<input type="number" min="1" ng-model="columnInfo.schedule.perDay" dir="ltr"/>
 			<input type="number" min="4" max="{{cells.length}}" ng-model="columnInfo.rowsPerColumn" dir="ltr"/>
