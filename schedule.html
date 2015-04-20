@@ -42,7 +42,7 @@
 			<input type="checkbox" ng-model="hideControls" />
 		</div>
 
-	<div ng-repeat="column in columns" style="display:inline-block;height:10in">
+	<div ng-repeat="column in columns track by $index" style="display:inline-block;height:10in">
 		<table>
 			<tr>
 				<th colspan="2">{{calcNum(getDate(column[0].dayIndex).getFullYear())}}</th>
@@ -51,7 +51,7 @@
 				<th>{{getMonth(getDate(column[0].dayIndex))}}</th>
 				<th>{{column[0].begin.book || column[0].bookOnly}}</th>
 			</tr>
-			<tr ng-repeat="cell in column">
+			<tr ng-repeat="cell in column track by $index">
 				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
 				<td ng-class="{'hidden':cell.hidden,newMonth:cell.bookOnly}">
 					<span ng-hide="cell.bookOnly">
