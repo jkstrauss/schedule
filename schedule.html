@@ -13,6 +13,10 @@
 		white-space:nowrap;
         font-size:15pt;
     }
+	
+	td {
+		text-align: initial;
+    }
 
     .shabboth {
 		background-color:#ddd;
@@ -25,6 +29,16 @@
 	.newMonth, .newBook {
 		background-color:gray;
 		color:white;
+		text-align:center;
+	}
+	
+	.column {
+		display:inline-block;
+		vertical-align:top
+	}
+	
+	.column:not(:first-child) {
+		margin-top:.5in;
 	}
 </style>
 </head>
@@ -42,7 +56,7 @@
 			<input type="checkbox" ng-model="hideControls" />
 		</div>
 
-	<div ng-repeat="column in columns track by $index" style="display:inline-block;height:10in">
+	<div ng-repeat="column in columns track by $index" class="column">
 		<table>
 			<tr>
 				<th colspan="2">{{calcNum(getDate(column[0].dayIndex).getFullYear())}}</th>
