@@ -155,9 +155,9 @@
 						chapterIndex++;
 					}
 
-						book = $scope.books[bookIndex];
-						chapterSize = book.chapters[chapterIndex];
-						return true;
+					book = $scope.books[bookIndex];
+					chapterSize = book.chapters[chapterIndex];
+					return true;
 				}
 
 				incrementChapter();
@@ -225,7 +225,7 @@
 				row = -1;
 				angular.forEach($scope.cells, function(cell, index) {
 					while((row = (row + 1) % rows) + cell.rowSpan > rows){
-									columnizedCells[row].push({hidden:true});
+						columnizedCells[row].push({hidden:true});
 					}
 					columnizedCells[row].push(cell);
 				});
