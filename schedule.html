@@ -19,6 +19,8 @@
     }
 
     .shabboth {
+		font-size:7pt;
+		white-space:normal;
 		background-color:#ddd;
 	}
 	
@@ -66,7 +68,7 @@
 				<th>{{(column[0].begin.book || column[0].bookOnly)[language]}}</th>
 			</tr>
 			<tr ng-repeat="cell in column track by $index">
-				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
+				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
 				<td ng-class="{'hidden':cell.hidden,newBook:cell.bookOnly}">
 					<span ng-hide="cell.bookOnly">
 						<span ng-show="cell.begin">
@@ -170,11 +172,15 @@
 			var hebrew = $scope.language == 'H';
 			var date = $scope.getDate(add);
 			var returnVal = {date:date};
+			var secondSedra;
 			if(date.getDate() == 1) {
 				returnVal['newMonth'] = true;
 				returnVal['display'] = date.getMonth() == (hebrew ? 7 : 0) ?
 					date.getFullYear() :
 					hebrew ? date.getMonthName('h').replace(/["']/g, '') : $filter('date')(date, 'MMM');
+			} else if(date.getDay() == 6 && hebrew) {
+				secondSedra = date.getSedra('h')[1];
+				returnVal['display'] = date.getSedra('h')[0] + (secondSedra ? ' - ' + secondSedra : '') ;
 			} else {
 				returnVal['display'] = date.getDate();
 			}
