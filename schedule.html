@@ -1,17 +1,17 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="myApp" ng-controller="myCtrl" >
  
 <head>
 <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.js"></script>
 <script src= "http://rawgit.com/hebcal/hebcal-js/master/client/hebcal.js"></script>
-<style>
+<style parse-style>
 	table, td, th {
 		border: black solid 1px;
     }
                
     td, th {
 		white-space:nowrap;
-        font-size:15pt;
+        font-size:{{style.fontSize}}pt;
     }
 	
 	td {
@@ -43,11 +43,12 @@
 </style>
 </head>
 
-<body ng-app="myApp" ng-controller="myCtrl" dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
+<body dir="{{language == 'H' ? 'rtl' : 'ltr'}}">
 <div style="width:7.5in;text-align:center;">
 		<div ng-hide="hideControls">
 			<input type="number" min="1" ng-model="columnInfo.schedule.perDay" dir="ltr"/>
 			<input type="number" min="4" max="{{cells.length}}" ng-model="columnInfo.rowsPerColumn" dir="ltr"/>
+			<input type="number" min="4" ng-model="style.fontSize" dir="ltr"/>
 			<input type="date" ng-model="start" dir="ltr"/>
 			<select ng-model="language" dir="ltr">
 				<option value="E">English</option>
@@ -96,11 +97,22 @@
 	}
 
 	var app = angular.module('myApp', []);
+	app.directive('parseStyle', function($interpolate) {
+		return function(scope, elem) {
+			var exp = $interpolate(elem.html()),
+				watchFunc = function () { return exp(scope); };
+			
+			scope.$watch(watchFunc, function (html) {
+				elem.html(html);
+			});
+		};
+	});
 	
 	var filter;
 	app.controller('myCtrl', function($scope, $filter) {
 		$scope.log = log;
 		$scope.columnInfo = {rowsPerColumn:28,schedule:{perDay:5}};
+		$scope.style = {fontSize:15};
 		$scope.books = [
 			{name:{H:'יהושע',E:'Joshua'},chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,43,34,16,33]},
 			{name:{H:'שופטים',E:'Judges'},chapters:[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25]},
