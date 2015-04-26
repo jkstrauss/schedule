@@ -145,11 +145,12 @@
 		];
 		var params = $location.search();
 		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{page:['Judges'],perDay:Number(params.perDay || 5)}};
-		$scope.start = new Date(2015, 3, 23);
+		$scope.start = params.startDate ? new Date(params.startDate) : new Date(2015, 3, 23);
+		$scope.hideControls = params.hideControls;
 		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
 		$scope.dates = {};
 		$scope.numbers = {};
-		$scope.language = 'H';
+		$scope.language = params.language || 'H';
 		$scope.cells = [];
 		$scope.columns = [];
 		$scope.getDate = function(add) {
