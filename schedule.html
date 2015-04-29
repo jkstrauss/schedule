@@ -238,6 +238,10 @@
 				function generatePoint(){
 					return {chapter:chapterIndex + 1,verse:verse,book:book.name};
 				}
+				
+				function showingBook(point) {
+					return $scope.columnInfo.schedule.limitBook.indexOf((point.book ? point.book : point.name)['E']) > -1;
+				}
 
 				function moveVerse (moveNum) {
 					var newVerse = verse + moveNum;
@@ -255,27 +259,38 @@
 				
 				while($scope.columnInfo.schedule.perDay >= 1 && moveVerse(1)){
 					dayIndex++;
-					if($scope.columnInfo.schedule.limitBook.indexOf(book.name['E']) < 0){
-						moveVerse($scope.columnInfo.schedule.perDay - 1);
-						continue;
+					if(!showingBook(book)){
+						var versesLeftInBook = book.endVerse - verseOffset;
+						if(versesLeftInBook >= $scope.columnInfo.schedule.perDay){
+							var daysMove = Math.floor(versesLeftInBook / $scope.columnInfo.schedule.perDay);
+							dayIndex += (daysMove - 1);
+							moveVerse((daysMove * $scope.columnInfo.schedule.perDay) - 1);
+							if(!showingBook(book)){
+								continue;
+							}
+						} else {
+							continue;
+						}
 					}
 					var firstCellIndex = cells.length;
 					var rowSpan = 1;
 					var begin = generatePoint();
 					moveVerse($scope.columnInfo.schedule.perDay - 1);
 					var end = generatePoint();
-					if(cells.length == 0 || begin.book != cells[cells.length - 1].end.book) {
-						cells.push({dayIndex:dayIndex,bookOnly:begin.book});
-						rowSpan++;
+					if(cells.length == 0 || (cells[cells.length - 1].end && begin.book != cells[cells.length - 1].end.book)) {
+						if(showingBook(begin)){
+							cells.push({dayIndex:dayIndex,bookOnly:begin.book});
+							rowSpan++;
+						}
 					}
-				   
+
 					if(begin.book != end.book){
 						rowSpan = 0;
-						if($scope.columnInfo.schedule.limitBook.indexOf(begin.book['E']) > -1){
+						if(showingBook(begin)){
 							cells.push({dayIndex:dayIndex,begin:begin});
 							rowSpan++;
 						}
-						if($scope.columnInfo.schedule.limitBook.indexOf(end.book['E']) > -1){
+						if(showingBook(end)){
 							cells.push({dayIndex:dayIndex,bookOnly:end.book});
 							cells.push({dayIndex:dayIndex,end:end});
 							rowSpan +=2;
@@ -283,7 +298,9 @@
 					} else {
 						cells.push({dayIndex:dayIndex,begin:begin,end:end});
 					}
-					cells[firstCellIndex].rowSpan=rowSpan;
+					if(cells[firstCellIndex]){
+						cells[firstCellIndex].rowSpan=rowSpan;
+					}
 					for(var c = firstCellIndex + 1; c < cells.length; c++){
 						cells[c].rowSpan = 0;
 					}
