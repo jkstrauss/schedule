@@ -151,7 +151,7 @@
 			book.endVerse = offset;
 		})
 		var params = $location.search();
-		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{page:['Judges'],perDay:Number(params.perDay || 5)}};
+		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{limitBook:['Judges'],perDay:Number(params.perDay || 5)}};
 		$scope.start = params.startDate ? new Date(params.startDate) : new Date(2015, 3, 23);
 		$scope.hideControls = params.hideControls;
 		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
@@ -255,7 +255,7 @@
 				
 				while($scope.columnInfo.schedule.perDay >= 1 && moveVerse(1)){
 					dayIndex++;
-					if($scope.columnInfo.schedule.page.indexOf(book.name['E']) < 0){
+					if($scope.columnInfo.schedule.limitBook.indexOf(book.name['E']) < 0){
 						moveVerse($scope.columnInfo.schedule.perDay - 1);
 						continue;
 					}
@@ -271,11 +271,11 @@
 				   
 					if(begin.book != end.book){
 						rowSpan = 0;
-						if($scope.columnInfo.schedule.page.indexOf(begin.book['E']) > -1){
+						if($scope.columnInfo.schedule.limitBook.indexOf(begin.book['E']) > -1){
 							cells.push({dayIndex:dayIndex,begin:begin});
 							rowSpan++;
 						}
-						if($scope.columnInfo.schedule.page.indexOf(end.book['E']) > -1){
+						if($scope.columnInfo.schedule.limitBook.indexOf(end.book['E']) > -1){
 							cells.push({dayIndex:dayIndex,bookOnly:end.book});
 							cells.push({dayIndex:dayIndex,end:end});
 							rowSpan +=2;
