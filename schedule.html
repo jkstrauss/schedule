@@ -18,6 +18,21 @@
 	td {
 		text-align: initial;
     }
+	
+	.dayIndex {
+		font-size:9pt;
+		border-bottom: black solid 1px;
+	}
+	
+	.review {
+        font-size:7pt;
+	}
+	
+	.dayIndex, .review {
+		white-space:nowrap;
+		text-align:center;
+	}
+	
 
     .shabboth {
 		background-color:#ddd;
@@ -60,14 +75,18 @@
 	<div ng-repeat="column in columns track by $index" class="column">
 		<table>
 			<tr>
-				<th colspan="2">{{calcNum(getDate(column[0].dayIndex).getFullYear())}}</th>
+				<th colspan="3">{{calcNum(getDate(column[0].dayIndex).getFullYear())}}</th>
 			</tr>
 			<tr>
-				<th>{{getMonth(getDate(column[0].dayIndex))}}</th>
+				<th colspan="2">{{getMonth(getDate(column[0].dayIndex))}}</th>
 				<th>{{(column[0].begin.book || column[0].bookOnly)[language]}}</th>
 			</tr>
 			<tr ng-repeat="cell in column track by $index">
 				<td ng-class="{'hidden':cell.hidden,'newMonth':calcDate(cell.dayIndex).newMonth,'shabboth ':getDate(cell.dayIndex).getDay() == 6}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">{{calcNum(calcDate(cell.dayIndex).display)}}</td>
+				<td ng-class="{'hidden':cell.hidden}" rowspan="{{cell.rowSpan}}" ng-hide="cell.rowSpan == 0">
+					<div class="dayIndex">{{cleanIndex(cell.dayIndex)}}</div>
+					<div class="review" dir="ltr">{{cleanIndex(cell.dayIndex % 3 == 0 ? cell.dayIndex - 9 : cell.dayIndex % 3 == 1 ? cell.dayIndex - 40 : cell.dayIndex - 128, true) || '-'}}</div>
+				</td>				
 				<td ng-class="{'hidden':cell.hidden,newBook:cell.bookOnly}">
 					<span ng-hide="cell.bookOnly">
 						<span ng-show="cell.begin">
@@ -151,7 +170,7 @@
 			book.endVerse = offset;
 		})
 		var params = $location.search();
-		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{limitBook:['Judges'],perDay:Number(params.perDay || 5)}};
+		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{limitBook:['Joshua'],perDay:Number(params.perDay || 5)}};
 		$scope.start = params.startDate ? new Date(params.startDate) : new Date(2015, 3, 23);
 		$scope.hideControls = params.hideControls;
 		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
@@ -169,6 +188,19 @@
 			}
 			return date[$scope.language];
 		}
+		
+		$scope.cleanIndex = function(index, dash) {
+			index++;
+			var returnVal = index > 0 ? index % 1000 : '';
+			if(dash){
+				var secondVal = $scope.cleanIndex(index + 1);
+				if(secondVal) {
+					returnVal += (' - ' + secondVal);
+				}
+			}
+			return returnVal;
+		}
+		
 
 		$scope.getMonth = function(date) {
 			return hebrew = $scope.language == 'H' ? 
