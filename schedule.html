@@ -151,7 +151,7 @@
 			book.endVerse = offset;
 		})
 		var params = $location.search();
-		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{limitBook:['Judges'],perDay:Number(params.perDay || 5)}};
+		$scope.columnInfo = {rowsPerColumn:Number(params.rowsPerColumn||28),schedule:{limitBook:['I Kings'],perDay:Number(params.perDay || 5)}};
 		$scope.start = params.startDate ? new Date(params.startDate) : new Date(2015, 3, 23);
 		$scope.hideControls = params.hideControls;
 		$scope.startHeb = new Hebcal.HDate($scope.start).abs();
